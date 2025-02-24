@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/textColorSecondary"
+    android:background="?android:attr/windowBackground"
     android:orientation="horizontal"
     android:padding="8dp">
 
@@ -10,11 +10,12 @@
         android:id="@+id/limitSpinner"
         android:layout_width="wrap_content"
         android:layout_height="56dp"
-        android:spinnerMode="dropdown"
-        android:background="@drawable/spinner_background"
-        android:popupBackground="@drawable/spinner_dropdown_background"
         android:layout_marginStart="8dp"
-        android:dropDownVerticalOffset="40dp" />
+        android:background="@drawable/spinner_background"
+        android:dropDownVerticalOffset="40dp"
+        android:popupBackground="@drawable/spinner_dropdown_background"
+        android:spinnerMode="dropdown"
+        android:visibility="gone" />
 
     <LinearLayout
         android:id="@+id/paginationButtonContainer"

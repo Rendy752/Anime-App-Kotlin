@@ -9,26 +9,21 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.animeapp.R
-import com.example.animeapp.data.remote.api.RetrofitInstance
 import com.example.animeapp.databinding.FragmentRecommendationBinding
-import com.example.animeapp.repository.AnimeRecommendationsRepository
 import com.example.animeapp.utils.Navigation
 import com.example.animeapp.utils.Resource
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class AnimeRecommendationsFragment : Fragment() {
     private var _binding: FragmentRecommendationBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var animeRecommendationsAdapter: AnimeRecommendationsAdapter
 
-    private val viewModel: AnimeRecommendationsViewModel by viewModels {
-        val animeRecommendationsRepository = AnimeRecommendationsRepository(
-            RetrofitInstance.api
-        )
-        AnimeRecommendationsViewModelProviderFactory(animeRecommendationsRepository)
-    }
+    private val viewModel: AnimeRecommendationsViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,

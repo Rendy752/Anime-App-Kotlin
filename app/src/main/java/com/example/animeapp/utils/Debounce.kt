@@ -16,10 +16,10 @@ class Debounce(
     private var searchJob: Job? = null
 
     fun query(text: String) {
-        if (text != viewModel.queryState.value.query) {
-            searchJob?.cancel()
-            searchJob = coroutineScope.launch {
-                delay(delayMillis)
+        searchJob?.cancel()
+        searchJob = coroutineScope.launch {
+            delay(delayMillis)
+            if (text != viewModel.queryState.value.query) {
                 onDebounced(text)
             }
         }

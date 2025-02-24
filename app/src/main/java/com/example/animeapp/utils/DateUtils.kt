@@ -11,4 +11,8 @@ object DateUtils {
         val date: Date = sdf.parse(dateString)!!
         return prettyTime.format(date)
     }
+
+    fun formatDate(year: Int, month: Int, dayOfMonth: Int): String {
+        return String.format(Locale.getDefault(),"%04d-%02d-%02d", year, month + 1, dayOfMonth)
+    }
 }

@@ -4,10 +4,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.animeapp.data.remote.api.AnimeAPI
 import com.example.animeapp.databinding.RelationItemBinding
 import com.example.animeapp.models.Relation
 
 class RelationsAdapter(
+    private val animeAPI: AnimeAPI,
     private val relations: List<Relation>?,
     private val onItemClickListener: (Int) -> Unit
 ) :
@@ -29,7 +31,7 @@ class RelationsAdapter(
                 "${relation.entry.size} ${relation.relation}".also {
                     tvRelationName.text = it
                 }
-                val relationItemsAdapter = EntriesAdapter(relation, onItemClickListener)
+                val relationItemsAdapter = EntriesAdapter(animeAPI, relation, onItemClickListener)
                 rvRelationItems.apply {
                     adapter = relationItemsAdapter
                     layoutManager = LinearLayoutManager(holder.itemView.context)

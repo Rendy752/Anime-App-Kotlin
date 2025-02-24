@@ -3,7 +3,7 @@ package com.example.animeapp.ui.animeDetail
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.animeapp.data.remote.api.RetrofitInstance
+import com.example.animeapp.data.remote.api.AnimeAPI
 import com.example.animeapp.databinding.AnimeSearchItemBinding
 import com.example.animeapp.models.AnimeDetail
 import com.example.animeapp.models.Relation
@@ -11,6 +11,7 @@ import com.example.animeapp.utils.AnimeHeaderUtils
 import kotlinx.coroutines.runBlocking
 
 class EntriesAdapter(
+    private val animeAPI: AnimeAPI,
     private val relationItems: Relation,
     private val onItemClickListener: (Int) -> Unit
 ) :
@@ -50,7 +51,7 @@ class EntriesAdapter(
 
     private fun getAnimeDetail(animeId: Int): AnimeDetail? {
         var detail: AnimeDetail? = null
-        val response = runBlocking { RetrofitInstance.api.getAnimeDetail(animeId) }
+        val response = runBlocking { animeAPI.getAnimeDetail(animeId) }
         if (response.isSuccessful) {
             detail = response.body()?.data
         }

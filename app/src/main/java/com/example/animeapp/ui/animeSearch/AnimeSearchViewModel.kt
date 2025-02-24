@@ -6,17 +6,19 @@ import com.example.animeapp.models.AnimeDetailResponse
 import com.example.animeapp.models.AnimeSearchQueryState
 import com.example.animeapp.models.AnimeSearchResponse
 import com.example.animeapp.models.CompletePagination
-import com.example.animeapp.models.Items
+import com.example.animeapp.models.GenresResponse
 import com.example.animeapp.repository.AnimeSearchRepository
-import com.example.animeapp.utils.Limit
 import com.example.animeapp.utils.Resource
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import retrofit2.Response
+import javax.inject.Inject
 
-class AnimeSearchViewModel(
+@HiltViewModel
+class AnimeSearchViewModel @Inject constructor(
     private val animeSearchRepository: AnimeSearchRepository
 ) : ViewModel() {
 
@@ -28,39 +30,27 @@ class AnimeSearchViewModel(
     private val _queryState = MutableStateFlow(AnimeSearchQueryState())
     val queryState: StateFlow<AnimeSearchQueryState> = _queryState.asStateFlow()
 
-    fun updateQuery(query: String) {
-        _queryState.value = queryState.value.copy(query = query, page = 1)
-        searchAnime()
-    }
-
-    fun updatePage(page: Int) {
-        _queryState.value = queryState.value.copy(page = page)
-        searchAnime()
-    }
-
-    fun updateLimit(limit: Int?) {
-        if (_queryState.value.limit != limit) {
-            _queryState.value = queryState.value.copy(limit = limit, page = 1)
-            searchAnime()
-        }
-    }
+    private val _genres = MutableStateFlow<Resource<GenresResponse>>(Resource.Loading())
+    val genres: StateFlow<Resource<GenresResponse>> = _genres.asStateFlow()
 
     init {
         getRandomAnime()
+        fetchGenres()
     }
 
-    fun searchAnime() = viewModelScope.launch {
-        if (queryState.value.query.isBlank()) {
+    private fun searchAnime() = viewModelScope.launch {
+        if (queryState.value.isDefault()) {
             getRandomAnime()
         } else {
             _animeSearchResults.value = Resource.Loading()
-            val response = animeSearchRepository.searchAnime(
-                queryState.value.query,
-                queryState.value.page,
-                queryState.value.limit ?: Limit.DEFAULT_LIMIT
-            )
+            val response = animeSearchRepository.searchAnime(queryState.value)
             _animeSearchResults.value = handleAnimeSearchResponse(response)
         }
+    }
+
+    fun applyFilters(updatedQueryState: AnimeSearchQueryState) {
+        _queryState.value = updatedQueryState
+        searchAnime()
     }
 
     private fun getRandomAnime() = viewModelScope.launch {
@@ -84,21 +74,32 @@ class AnimeSearchViewModel(
             response.body()?.let { resultResponse ->
                 val searchResponse = AnimeSearchResponse(
                     data = listOf(resultResponse.data),
-                    pagination = CompletePagination(
-                        last_visible_page = 1,
-                        has_next_page = false,
-                        current_page = 1,
-                        items = Items(
-                            count = 1,
-                            total = 1,
-                            per_page = 1
-                        )
-                    )
+                    pagination = CompletePagination.default()
                 )
                 return Resource.Success(searchResponse)
             } ?: return Resource.Error("Response body is null")
         } else {
             return Resource.Error(response.message())
         }
+    }
+
+    fun fetchGenres() = viewModelScope.launch {
+        _genres.value = Resource.Loading()
+        val response = animeSearchRepository.getGenres()
+        _genres.value = handleGenresResponse(response)
+    }
+
+    private fun handleGenresResponse(response: Response<GenresResponse>): Resource<GenresResponse> {
+        if (response.isSuccessful) {
+            response.body()?.let { resultResponse ->
+                return Resource.Success(resultResponse)
+            }
+        }
+        return Resource.Error(response.message())
+    }
+
+    fun resetBottomSheetFilters() {
+        _queryState.value = queryState.value.resetBottomSheetFilters()
+        searchAnime()
     }
 }

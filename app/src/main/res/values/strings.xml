@@ -49,4 +49,26 @@
     <string name="streaming">Streaming</string>
     <string name="three_dots">…</string>
     <string name="list">List</string>
+    <string name="filter_anime">Filter Anime</string>
+    <string name="apply">Apply</string>
+    <string name="type_field">Type</string>
+    <string name="score_field">Score</string>
+    <string name="min_score_field">Min Score</string>
+    <string name="max_score_field">Max Score</string>
+    <string name="status_field">Status</string>
+    <string name="rating_field">Rating</string>
+    <string name="order_by_field">Order By</string>
+    <string name="sort_field">Sort</string>
+    <string name="letter_field">Letter</string>
+    <string name="genres_field">Genres</string>
+    <string name="producers_field">Producers</string>
+    <string name="start_date_field">Start Date</string>
+    <string name="end_date_field">End Date</string>
+    <string name="include_unapproved_field">Include Unapproved</string>
+    <string name="sfw_only_field">SFW Only</string>
+    <string name="enable_date_range">Enable Date Range</string>
+    <string name="chevron_down">Chevron Down</string>
+    <string name="no_genres_found">No genres found</string>
+    <string name="retry">Retry</string>
+    <string name="reset">Reset</string>
 </resources>
