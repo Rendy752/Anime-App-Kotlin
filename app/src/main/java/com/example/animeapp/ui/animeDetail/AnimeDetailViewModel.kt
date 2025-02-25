@@ -6,10 +6,13 @@ import androidx.lifecycle.viewModelScope
 import com.example.animeapp.models.AnimeDetailResponse
 import com.example.animeapp.repository.AnimeDetailRepository
 import com.example.animeapp.utils.Resource
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import retrofit2.Response
+import javax.inject.Inject
 
-class AnimeDetailViewModel(
+@HiltViewModel
+class AnimeDetailViewModel @Inject constructor(
     private val animeDetailRepository: AnimeDetailRepository
 ) : ViewModel() {
     val animeDetail: MutableLiveData<Resource<AnimeDetailResponse>?> = MutableLiveData()

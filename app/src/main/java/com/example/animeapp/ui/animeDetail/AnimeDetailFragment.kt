@@ -19,10 +19,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.animeapp.R
-import com.example.animeapp.data.local.database.AnimeDetailDatabase
+import com.example.animeapp.data.remote.api.AnimeAPI
 import com.example.animeapp.databinding.FragmentDetailBinding
 import com.example.animeapp.models.AnimeDetailResponse
-import com.example.animeapp.repository.AnimeDetailRepository
 import com.example.animeapp.ui.common.NameAndUrlAdapter
 import com.example.animeapp.ui.common.TitleSynonymsAdapter
 import com.example.animeapp.ui.common.UnorderedListAdapter
@@ -31,18 +30,18 @@ import com.example.animeapp.utils.Navigation
 import com.example.animeapp.utils.Resource
 import com.example.animeapp.utils.TextUtils.formatSynopsis
 import com.example.animeapp.utils.TextUtils.joinOrNA
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class AnimeDetailFragment : Fragment(), MenuProvider {
+    @Inject
+    lateinit var animeAPI: AnimeAPI
+
     private var _binding: FragmentDetailBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: AnimeDetailViewModel by viewModels {
-        val animeDetailRepository = AnimeDetailRepository(
-            animeDetailDao = AnimeDetailDatabase.getDatabase(requireActivity()).getAnimeDetailDao()
-        )
-        AnimeDetailViewModelProviderFactory(animeDetailRepository)
-    }
+    private val viewModel: AnimeDetailViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -258,7 +257,7 @@ class AnimeDetailFragment : Fragment(), MenuProvider {
                         tvRelation.text = it
                     }
                     rvRelations.apply {
-                        adapter = RelationsAdapter(detail.relations) { animeId ->
+                        adapter = RelationsAdapter(animeAPI, detail.relations) { animeId ->
                             Navigation.navigateToAnimeDetail(
                                 this@AnimeDetailFragment,
                                 animeId,

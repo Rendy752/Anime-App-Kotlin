@@ -1,10 +1,9 @@
 package com.example.animeapp.repository
 
 import com.example.animeapp.data.remote.api.AnimeAPI
-import com.example.animeapp.data.remote.api.RetrofitInstance
 
 class AnimeRecommendationsRepository(
-    private val api: AnimeAPI = RetrofitInstance.api
+    private val api: AnimeAPI
 ) {
     suspend fun getAnimeRecommendations(page: Int = 1) =
         api.getAnimeRecommendations(page)

@@ -3,6 +3,8 @@ package com.example.animeapp.data.remote.api
 import com.example.animeapp.models.AnimeDetailResponse
 import com.example.animeapp.models.AnimeRecommendationResponse
 import com.example.animeapp.models.AnimeSearchResponse
+import com.example.animeapp.models.GenresResponse
+import com.example.animeapp.models.ProducersResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -44,4 +46,17 @@ interface AnimeAPI {
         @Query("start_date") startDate: String? = null,
         @Query("end_date") endDate: String? = null
     ): Response<AnimeSearchResponse>
+
+    @GET("v4/genres/anime")
+    suspend fun getGenres(): Response<GenresResponse>
+
+    @GET("v4/producers")
+    suspend fun getProducers(
+        @Query("page") page: Int? = null,
+        @Query("limit") limit: Int? = null,
+        @Query("q") q: String,
+        @Query("order_by") orderBy: String? = null,
+        @Query("sort") sort: String? = null,
+        @Query("letter") letter: String? = null
+    ): Response<ProducersResponse>
 }

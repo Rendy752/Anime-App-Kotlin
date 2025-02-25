@@ -5,13 +5,16 @@ import androidx.lifecycle.viewModelScope
 import com.example.animeapp.models.AnimeRecommendationResponse
 import com.example.animeapp.repository.AnimeRecommendationsRepository
 import com.example.animeapp.utils.Resource
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import retrofit2.Response
+import javax.inject.Inject
 
-class AnimeRecommendationsViewModel(
+@HiltViewModel
+class AnimeRecommendationsViewModel @Inject constructor(
     private val animeRecommendationsRepository: AnimeRecommendationsRepository
 ) : ViewModel() {
 

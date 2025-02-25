@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
     id("kotlin-parcelize")
     id("kotlinx-serialization")
@@ -40,6 +41,9 @@ android {
     }
     buildFeatures {
         viewBinding = true
+    }
+    hilt {
+        enableAggregatingTask = true
     }
 }
 
@@ -85,10 +89,10 @@ dependencies {
 
     //Hilt
     implementation(libs.hilt.android)
-    ksp(libs.hilt.android.compiler)
+    kapt(libs.hilt.android.compiler)
 
     //ViewModel injection
-    ksp(libs.androidx.hilt.compiler)
+    kapt(libs.androidx.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.fragment)
 
     //Kotlinx Serialization
@@ -127,4 +131,8 @@ dependencies {
     testImplementation(libs.byte.buddy.agent)
     implementation(libs.androidx.multidex)
     androidTestImplementation(libs.mockwebserver)
+}
+
+kapt {
+    correctErrorTypes = true
 }
