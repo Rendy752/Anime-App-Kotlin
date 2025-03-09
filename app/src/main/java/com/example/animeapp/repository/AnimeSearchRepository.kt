@@ -5,11 +5,11 @@ import com.example.animeapp.models.AnimeSearchQueryState
 import com.example.animeapp.models.ProducersSearchQueryState
 
 class AnimeSearchRepository(
-    private val api: AnimeAPI
+    private val jikanAPI: AnimeAPI
 ) {
     suspend fun searchAnime(
         queryState: AnimeSearchQueryState
-    ) = api.getAnimeSearch(
+    ) = jikanAPI.getAnimeSearch(
         q = queryState.query,
         page = queryState.page,
         limit = queryState.limit,
@@ -31,13 +31,13 @@ class AnimeSearchRepository(
         endDate = queryState.endDate
     )
 
-    suspend fun getRandomAnime() = api.getRandomAnime()
+    suspend fun getRandomAnime() = jikanAPI.getRandomAnime()
 
-    suspend fun getGenres() = api.getGenres()
+    suspend fun getGenres() = jikanAPI.getGenres()
 
     suspend fun getProducers(
         queryState: ProducersSearchQueryState
-    ) = api.getProducers(
+    ) = jikanAPI.getProducers(
         page = queryState.page,
         limit = queryState.limit,
         q = queryState.query,

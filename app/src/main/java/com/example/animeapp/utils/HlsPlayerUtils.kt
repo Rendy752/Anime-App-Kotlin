@@ -112,7 +112,7 @@ object HlsPlayerUtil {
                     .build()
             }
 
-            val result = audioManager.requestAudioFocus(audioFocusRequest!!)
+            val result = audioFocusRequest?.let { audioManager.requestAudioFocus(it) }
             if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 audioFocusRequested = true
             }
@@ -121,7 +121,7 @@ object HlsPlayerUtil {
 
     fun abandonAudioFocus(audioManager: AudioManager) {
         if (audioFocusRequested) {
-            audioManager.abandonAudioFocusRequest(audioFocusRequest!!)
+            audioFocusRequest?.let { audioManager.abandonAudioFocusRequest(it) }
             audioFocusRequested = false
         }
     }

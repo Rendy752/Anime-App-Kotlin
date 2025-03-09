@@ -293,7 +293,7 @@ class AnimeWatchFragment : Fragment() {
                     viewLifecycleOwner.lifecycleScope.launch {
                         viewModel.episodeWatch.collect { response ->
                             if (response is Resource.Success) {
-                                response.data!!.servers.episodeNo.let {
+                                response.data?.servers?.episodeNo?.let {
                                     (adapter as EpisodesWatchAdapter).updateSelectedEpisode(it)
                                     handleJumpToEpisode(it, episodes)
                                 }
@@ -364,7 +364,7 @@ class AnimeWatchFragment : Fragment() {
     }
 
     private fun handleEpisodeWatchError() {
-        viewModel.handleSelectedEpisodeServer(viewModel.episodes.value!!.first().episodeId)
+        viewModel.episodes.value?.first()?.episodeId?.let { viewModel.handleSelectedEpisodeServer(it) }
     }
 
     private fun handleEpisodeWatchLoading() {

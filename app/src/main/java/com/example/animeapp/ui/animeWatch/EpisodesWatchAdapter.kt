@@ -70,7 +70,7 @@ class EpisodesWatchAdapter(
 
             StreamingUtils.getEpisodeBackground(
                 context, episode, if (isSelected) {
-                    selectedEpisodeNo!!
+                    selectedEpisodeNo
                 } else {
                     -1
                 }
@@ -122,7 +122,12 @@ class EpisodesWatchAdapter(
             false
         )
 
-        tooltipPopupWindow?.showAsDropDown(anchorView, 0, -anchorView.height * 2 + 10, Gravity.CENTER)
+        tooltipPopupWindow?.showAsDropDown(
+            anchorView,
+            0,
+            -anchorView.height * 2 + 10,
+            Gravity.CENTER
+        )
     }
 
     private fun hideTooltip() {

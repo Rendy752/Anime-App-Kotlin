@@ -5,6 +5,7 @@ import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorManager
 import com.chuckerteam.chucker.api.Chucker
+import com.example.animeapp.BuildConfig.DEBUG
 import com.example.animeapp.utils.ShakeDetector
 import com.example.animeapp.utils.Theme
 import dagger.hilt.android.HiltAndroidApp
@@ -17,7 +18,8 @@ class AnimeApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         setupTheme()
-        setupSensor()
+
+        if (DEBUG) setupSensor()
     }
 
     private fun isDarkMode(): Boolean {
@@ -39,5 +41,4 @@ class AnimeApplication : Application() {
             SensorManager.SENSOR_DELAY_NORMAL
         )
     }
-
 }

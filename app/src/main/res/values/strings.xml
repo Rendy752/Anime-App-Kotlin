@@ -99,4 +99,7 @@
     <string name="restart_icon">Restart Icon</string>
     <string name="skip_previous_icon">Skip Previous Icon</string>
     <string name="skip_next_icon">Skip Next Icon</string>
+    <string name="network_status">Network Status</string>
+    <string name="_0_kbps">0 Kbps</string>
+    <string name="network_status_icon">Network Status Icon</string>
 </resources>

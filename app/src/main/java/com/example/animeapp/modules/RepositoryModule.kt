@@ -24,13 +24,15 @@ object RepositoryModule {
         animeDetailDao: AnimeDetailDao,
         animeDetailComplementDao: AnimeDetailComplementDao,
         episodeDetailComplementDao: EpisodeDetailComplementDao,
-        @JikanApi animeAPI: AnimeAPI
+        @JikanApi jikanAPI: AnimeAPI,
+        @AnimeRunwayApi runwayAPI: AnimeAPI
     ): AnimeDetailRepository {
         return AnimeDetailRepository(
             animeDetailDao,
             animeDetailComplementDao,
             episodeDetailComplementDao,
-            animeAPI
+            jikanAPI,
+            runwayAPI
         )
     }
 
