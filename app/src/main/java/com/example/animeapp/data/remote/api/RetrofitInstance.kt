@@ -1,7 +1,6 @@
 package com.example.animeapp.data.remote.api
 
-import com.example.animeapp.utils.Const.Companion.JIKAN_URL
-import com.example.animeapp.utils.Const.Companion.ANIMERUNWAY_URL
+import com.example.animeapp.BuildConfig
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -14,7 +13,7 @@ class RetrofitInstance @Inject constructor(
 ) {
 
     private var jikanRetrofit: Retrofit = Retrofit.Builder()
-        .baseUrl(JIKAN_URL)
+        .baseUrl(BuildConfig.JIKAN_URL)
         .client(okHttpClient)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
@@ -22,7 +21,7 @@ class RetrofitInstance @Inject constructor(
     val jikanApi: AnimeAPI by lazy { jikanRetrofit.create(AnimeAPI::class.java) }
 
     private var animeRunwayRetrofit: Retrofit = Retrofit.Builder()
-        .baseUrl(ANIMERUNWAY_URL)
+        .baseUrl(BuildConfig.ANIMERUNWAY_URL)
         .client(okHttpClient)
         .addConverterFactory(GsonConverterFactory.create())
         .build()

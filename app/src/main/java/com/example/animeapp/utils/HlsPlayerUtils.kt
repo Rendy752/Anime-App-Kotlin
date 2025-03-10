@@ -79,11 +79,6 @@ object HlsPlayerUtil {
                         }
                     }
 
-                    AudioManager.AUDIOFOCUS_LOSS,
-                    AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
-                        player.pause()
-                    }
-
                     AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> {
                         player.volume = 0.5f
                     }
@@ -112,7 +107,7 @@ object HlsPlayerUtil {
                     .build()
             }
 
-            val result = audioManager.requestAudioFocus(audioFocusRequest!!)
+            val result = audioFocusRequest?.let { audioManager.requestAudioFocus(it) }
             if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 audioFocusRequested = true
             }
@@ -121,7 +116,7 @@ object HlsPlayerUtil {
 
     fun abandonAudioFocus(audioManager: AudioManager) {
         if (audioFocusRequested) {
-            audioManager.abandonAudioFocusRequest(audioFocusRequest!!)
+            audioFocusRequest?.let { audioManager.abandonAudioFocusRequest(it) }
             audioFocusRequested = false
         }
     }

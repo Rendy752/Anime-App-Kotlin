@@ -53,15 +53,7 @@ class AnimeWatchViewModel @Inject constructor(
     ) = viewModelScope.launch {
         _episodeWatch.value = Resource.Loading()
 
-        if (episodeId == _defaultEpisode.value?.id) {
-            restoreDefaultValues()
-            return@launch
-        }
-
-        if (episodeSourcesQuery == _episodeSourcesQuery.value) {
-            restoreDefaultValues()
-            return@launch
-        }
+        if (episodeId == _defaultEpisode.value?.id && episodeSourcesQuery == _episodeSourcesQuery.value) return@launch
 
         val episodeServersResponse = animeStreamingRepository.getEpisodeServers(episodeId)
         val episodeServerResource = ResponseHandler.handleCommonResponse(episodeServersResponse)

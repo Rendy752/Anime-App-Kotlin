@@ -25,18 +25,10 @@ class AnimeRecommendationsViewModel @Inject constructor(
 
     private var animeRecommendationsPage = 1
 
-    init {
-        getAnimeRecommendations()
-    }
-
-    private fun getAnimeRecommendations() = viewModelScope.launch {
+    fun getAnimeRecommendations() = viewModelScope.launch {
         _animeRecommendations.value = Resource.Loading()
         val response =
             animeRecommendationsRepository.getAnimeRecommendations(animeRecommendationsPage)
         _animeRecommendations.value = ResponseHandler.handleCommonResponse(response)
-    }
-
-    fun refreshData() {
-        getAnimeRecommendations()
     }
 }

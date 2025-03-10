@@ -1,5 +1,6 @@
 package com.example.animeapp.ui.animeDetail
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,9 +9,10 @@ import com.example.animeapp.databinding.EpisodeDetailItemBinding
 import com.example.animeapp.models.Episode
 import com.example.animeapp.utils.StreamingUtils
 
+@SuppressLint("NotifyDataSetChanged")
 class EpisodesDetailAdapter(
     private val context: Context,
-    private val episodes: List<Episode>,
+    val episodes: MutableList<Episode>,
     private val onEpisodeClick: (String) -> Unit
 ) : RecyclerView.Adapter<EpisodesDetailAdapter.EpisodeViewHolder>() {
 
@@ -38,6 +40,17 @@ class EpisodesDetailAdapter(
             "Ep. ${episode.episodeNo}".also { tvEpisodeNumber.text = it }
             tvEpisodeTitle.text = episode.name
         }
+    }
+
+    fun addData(newData: List<Episode>) {
+        episodes.addAll(newData)
+        notifyItemRangeInserted(episodes.size - newData.size, newData.size)
+    }
+
+    fun replaceData(newData: List<Episode>){
+        episodes.clear()
+        episodes.addAll(newData)
+        notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int {
