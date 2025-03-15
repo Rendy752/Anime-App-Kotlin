@@ -6,7 +6,6 @@ import com.example.animeapp.models.AnimeDetail
 import com.example.animeapp.models.Episode
 import com.example.animeapp.models.EpisodeDetailComplement
 import com.example.animeapp.models.EpisodeSourcesQuery
-import com.example.animeapp.models.EpisodeWatch
 import com.example.animeapp.repository.AnimeStreamingRepository
 import com.example.animeapp.utils.Resource
 import com.example.animeapp.utils.ResponseHandler
@@ -28,10 +27,12 @@ class AnimeWatchViewModel @Inject constructor(
     private val _episodes = MutableStateFlow<List<Episode>?>(null)
     val episodes: StateFlow<List<Episode>?> = _episodes.asStateFlow()
 
-    private val _defaultEpisode = MutableStateFlow<EpisodeDetailComplement?>(null)
+    private val _defaultEpisodeDetailComplement = MutableStateFlow<EpisodeDetailComplement?>(null)
 
-    private val _episodeWatch = MutableStateFlow<Resource<EpisodeWatch>>(Resource.Loading())
-    val episodeWatch: StateFlow<Resource<EpisodeWatch>> = _episodeWatch.asStateFlow()
+    private val _episodeDetailComplement =
+        MutableStateFlow<Resource<EpisodeDetailComplement>>(Resource.Loading())
+    val episodeDetailComplement: StateFlow<Resource<EpisodeDetailComplement>> =
+        _episodeDetailComplement.asStateFlow()
 
     private val _episodeSourcesQuery = MutableStateFlow<EpisodeSourcesQuery?>(null)
     val episodeSourcesQuery: StateFlow<EpisodeSourcesQuery?> = _episodeSourcesQuery.asStateFlow()
@@ -43,66 +44,144 @@ class AnimeWatchViewModel @Inject constructor(
     ) {
         _animeDetail.value = animeDetail
         _episodes.value = episodes
-        _defaultEpisode.value = defaultEpisode
+        _defaultEpisodeDetailComplement.value = defaultEpisode
         restoreDefaultValues()
     }
 
     fun handleSelectedEpisodeServer(
-        episodeId: String,
-        episodeSourcesQuery: EpisodeSourcesQuery? = null
+        episodeSourcesQuery: EpisodeSourcesQuery,
+        isRefreshed: Boolean = false
     ) = viewModelScope.launch {
-        _episodeWatch.value = Resource.Loading()
+        try {
+            _episodeDetailComplement.value = Resource.Loading()
+            _episodeSourcesQuery.value = episodeSourcesQuery
+            if (!isRefreshed) {
+                val cachedEpisodeDetailComplement =
+                    animeStreamingRepository.getCachedEpisodeDetailComplement(episodeSourcesQuery.id)
 
-        if (episodeId == _defaultEpisode.value?.id) {
-            restoreDefaultValues()
-            return@launch
-        }
+                if (cachedEpisodeDetailComplement != null) {
+                    if (cachedEpisodeDetailComplement.sourcesQuery == episodeSourcesQuery) {
+                        _episodeDetailComplement.value =
+                            Resource.Success(cachedEpisodeDetailComplement)
+                        return@launch
+                    } else {
+                        // Cached data exists, but query has changed, fetch new sources
+                        val episodeServersResource =
+                            Resource.Success(cachedEpisodeDetailComplement.servers) // Use cached servers
 
-        if (episodeSourcesQuery == _episodeSourcesQuery.value) {
-            restoreDefaultValues()
-            return@launch
-        }
+                        val episodeSourcesResource = StreamingUtils.getEpisodeSources(
+                            episodeServersResource,
+                            animeStreamingRepository,
+                            episodeSourcesQuery
+                        )
 
-        val episodeServersResponse = animeStreamingRepository.getEpisodeServers(episodeId)
-        val episodeServerResource = ResponseHandler.handleCommonResponse(episodeServersResponse)
+                        if (episodeSourcesResource !is Resource.Success) {
+                            restoreDefaultValues()
+                            _episodeDetailComplement.value =
+                                Resource.Error(
+                                    episodeSourcesResource.message
+                                        ?: "Failed to fetch episode sources"
+                                )
+                            return@launch
+                        }
 
-        if (episodeServerResource !is Resource.Success) {
-            restoreDefaultValues()
-            return@launch
-        }
+                        episodeServersResource.data?.let { servers ->
+                            episodeSourcesResource.data?.let { sources ->
+                                val updatedEpisodeDetailComplement =
+                                    cachedEpisodeDetailComplement.copy(
+                                        servers = servers,
+                                        sources = sources,
+                                        sourcesQuery = episodeSourcesQuery
+                                    )
 
-        val episodeSourcesResource = StreamingUtils.getEpisodeSources(
-            episodeServerResource,
-            animeStreamingRepository,
-            episodeSourcesQuery
-        )
+                                animeStreamingRepository.updateEpisodeDetailComplement(
+                                    updatedEpisodeDetailComplement
+                                )
+                                _episodeDetailComplement.value =
+                                    Resource.Success(updatedEpisodeDetailComplement)
+                                return@launch
+                            }
+                        }
+                    }
+                }
+            }
 
-        if (episodeSourcesResource !is Resource.Success) {
-            restoreDefaultValues()
-            return@launch
-        }
+            val episodeServersResponse =
+                animeStreamingRepository.getEpisodeServers(episodeSourcesQuery.id)
+            val episodeServersResource =
+                ResponseHandler.handleCommonResponse(episodeServersResponse)
 
-        _episodeSourcesQuery.value =
-            episodeSourcesQuery ?: StreamingUtils.getEpisodeQuery(episodeServerResource, episodeId)
+            if (episodeServersResource !is Resource.Success) {
+                restoreDefaultValues()
+                _episodeDetailComplement.value =
+                    Resource.Error(
+                        episodeServersResource.message ?: "Failed to fetch episode servers"
+                    )
+                return@launch
+            }
 
-        _episodeWatch.value = Resource.Success(
-            EpisodeWatch(
-                episodeServerResource.data!!,
-                episodeSourcesResource.data!!
+            val episodeSourcesResource = StreamingUtils.getEpisodeSources(
+                episodeServersResource,
+                animeStreamingRepository,
+                episodeSourcesQuery
             )
-        )
+
+            if (episodeSourcesResource !is Resource.Success) {
+                restoreDefaultValues()
+                _episodeDetailComplement.value =
+                    Resource.Error(
+                        episodeSourcesResource.message ?: "Failed to fetch episode sources"
+                    )
+                return@launch
+            }
+
+            episodeServersResource.data?.let { servers ->
+                episodeSourcesResource.data?.let { sources ->
+                    val cachedEpisodeDetailComplement =
+                        animeStreamingRepository.getCachedEpisodeDetailComplement(
+                            episodeSourcesQuery.id
+                        )
+                    if (cachedEpisodeDetailComplement != null && cachedEpisodeDetailComplement.sourcesQuery != episodeSourcesQuery) {
+                        animeStreamingRepository.updateEpisodeDetailComplement(
+                            cachedEpisodeDetailComplement.copy(
+                                servers = servers,
+                                sources = sources,
+                                sourcesQuery = episodeSourcesQuery
+                            )
+                        )
+                    } else {
+                        val remoteEpisodeDetailComplement = animeDetail.value?.let { animeDetail ->
+                            EpisodeDetailComplement(
+                                id = servers.episodeId,
+                                title = animeDetail.title,
+                                imageUrl = animeDetail.images.jpg.image_url,
+                                servers = servers,
+                                sources = sources,
+                                sourcesQuery = episodeSourcesQuery
+                            )
+                        }
+
+                        if (remoteEpisodeDetailComplement != null) {
+                            animeStreamingRepository.insertCachedEpisodeDetailComplement(
+                                remoteEpisodeDetailComplement
+                            )
+                            _episodeDetailComplement.value =
+                                Resource.Success(remoteEpisodeDetailComplement)
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            restoreDefaultValues()
+            _episodeDetailComplement.value =
+                Resource.Error(e.message ?: "An unexpected error occurred")
+        }
     }
 
     private fun restoreDefaultValues() {
-        _episodeWatch.value = Resource.Success(
-            EpisodeWatch(
-                _defaultEpisode.value!!.servers,
-                _defaultEpisode.value!!.sources
-            )
-        )
-        _episodeSourcesQuery.value = StreamingUtils.getEpisodeQuery(
-            Resource.Success(_defaultEpisode.value!!.servers),
-            _defaultEpisode.value!!.id
-        )
+        _defaultEpisodeDetailComplement.value?.let { default ->
+            _episodeDetailComplement.value = Resource.Success(default)
+            _episodeSourcesQuery.value = default.sourcesQuery
+        }
     }
 }

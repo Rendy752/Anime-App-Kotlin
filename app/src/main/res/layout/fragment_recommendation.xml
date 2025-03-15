@@ -6,6 +6,19 @@
     android:layout_height="match_parent"
     tools:context=".ui.animeRecommendations.AnimeRecommendationsFragment">
 
+    <TextView
+        android:id="@+id/tvError"
+        style="@style/container.withMargin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/no_internet_connection"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@id/rvAnimeRecommendations"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvAnimeRecommendations"
         android:layout_width="0dp"
@@ -14,7 +27,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/tvError" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabRefresh"
@@ -24,6 +37,7 @@
         android:layout_marginBottom="16dp"
         android:contentDescription="@string/refresh_button"
         android:src="@drawable/ic_refresh_blue_24dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

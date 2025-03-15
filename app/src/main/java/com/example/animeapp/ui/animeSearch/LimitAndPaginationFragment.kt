@@ -27,7 +27,7 @@ class LimitAndPaginationFragment : Fragment() {
     private var _binding: FragmentLimitAndPaginationBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: AnimeSearchViewModel by viewModels(ownerProducer = { requireParentFragment() })
+    private val viewModel: AnimeSearchViewModel by viewModels({ requireParentFragment() })
 
     override fun onCreateView(
         inflater: LayoutInflater,

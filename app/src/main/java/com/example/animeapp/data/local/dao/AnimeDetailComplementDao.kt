@@ -7,6 +7,7 @@ import androidx.room.Update
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.animeapp.models.AnimeDetailComplement
+import java.time.Instant
 
 @Dao
 interface AnimeDetailComplementDao {
@@ -16,12 +17,21 @@ interface AnimeDetailComplementDao {
     @Query("SELECT * FROM anime_detail_complement WHERE id = :id")
     fun getAnimeDetailComplementById(id: String): AnimeDetailComplement?
 
-    @Query("SELECT * FROM anime_detail_complement WHERE mal_id = :mal_id")
-    fun getAnimeDetailComplementByMalId(mal_id: Int): AnimeDetailComplement?
+    @Query("SELECT * FROM anime_detail_complement WHERE malId = :malId")
+    fun getAnimeDetailComplementByMalId(malId: Int): AnimeDetailComplement?
 
     @Delete
     suspend fun deleteAnimeDetailComplement(animeDetailComplement: AnimeDetailComplement)
 
     @Update
-    suspend fun updateAnimeDetailComplement(animeDetailComplement: AnimeDetailComplement)
+    suspend fun updateAnimeDetailComplement(animeDetail: AnimeDetailComplement)
+
+    @Update
+    suspend fun updateEpisodeAnimeDetailComplement(animeDetail: AnimeDetailComplement) {
+        val updatedAnime = animeDetail.copy(
+            lastEpisodeUpdatedAt = Instant.now().epochSecond,
+            updatedAt = Instant.now().epochSecond
+        )
+        updateAnimeDetailComplement(updatedAnime)
+    }
 }

@@ -17,12 +17,12 @@ object FindAnimeTitle {
     )
     private val numberRegex = Pattern.compile("\\d+")
 
-    fun findClosestAnime(
+    fun findClosestAnimes(
         animeSearchData: AnimeAniwatchSearchResponse,
         animeDetail: AnimeDetail?
-    ): AnimeAniwatch? {
+    ): List<AnimeAniwatch> {
         if (animeDetail == null) {
-            return animeSearchData.animes.minByOrNull { it.name.normalizeForComparison() }
+            return animeSearchData.animes.sortedBy { it.name.normalizeForComparison() }.take(2)
         }
 
         val normalizedDetailTitles = listOfNotNull(
@@ -30,7 +30,7 @@ object FindAnimeTitle {
             animeDetail.title_english?.normalizeForComparison()
         ) + (animeDetail.title_synonyms?.map { it.normalizeForComparison() } ?: emptyList())
 
-        return animeSearchData.animes.map { anime ->
+        val scoredAnimes = animeSearchData.animes.map { anime ->
             val normalizedAnimeName = anime.name.normalizeForComparison()
             Log.d("FindAnimeTitle", "Comparing '${anime.name}' with '${animeDetail.title}'")
 
@@ -40,9 +40,12 @@ object FindAnimeTitle {
 
             Log.d("FindAnimeTitle", "Best score for '${anime.name}': $bestScore")
             ScoredAnime(anime, bestScore)
-        }.maxByOrNull { it.score }
-            ?.takeIf { it.score >= MIN_SIMILARITY_THRESHOLD }
-            ?.anime
+        }
+
+        return scoredAnimes.sortedByDescending { it.score }
+            .filter { it.score >= MIN_SIMILARITY_THRESHOLD }
+            .take(2)
+            .map { it.anime }
     }
 
     private fun extractCoreTitleAndNumber(title: String): Pair<String, Pair<Int?, String?>> {

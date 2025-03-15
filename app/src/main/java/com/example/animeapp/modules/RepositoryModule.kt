@@ -24,13 +24,15 @@ object RepositoryModule {
         animeDetailDao: AnimeDetailDao,
         animeDetailComplementDao: AnimeDetailComplementDao,
         episodeDetailComplementDao: EpisodeDetailComplementDao,
-        @JikanApi animeAPI: AnimeAPI
+        @JikanApi jikanAPI: AnimeAPI,
+        @AnimeRunwayApi runwayAPI: AnimeAPI
     ): AnimeDetailRepository {
         return AnimeDetailRepository(
             animeDetailDao,
             animeDetailComplementDao,
             episodeDetailComplementDao,
-            animeAPI
+            jikanAPI,
+            runwayAPI
         )
     }
 
@@ -45,7 +47,10 @@ object RepositoryModule {
     }
 
     @Provides
-    fun provideAnimeStreamingRepository(@AnimeRunwayApi animeAPI: AnimeAPI): AnimeStreamingRepository {
-        return AnimeStreamingRepository(animeAPI)
+    fun provideAnimeStreamingRepository(
+        episodeDetailComplementDao: EpisodeDetailComplementDao,
+        @AnimeRunwayApi animeAPI: AnimeAPI
+    ): AnimeStreamingRepository {
+        return AnimeStreamingRepository(episodeDetailComplementDao, animeAPI)
     }
 }

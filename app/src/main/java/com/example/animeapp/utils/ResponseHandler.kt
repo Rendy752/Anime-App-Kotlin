@@ -1,6 +1,9 @@
 package com.example.animeapp.utils
 
+import okhttp3.ResponseBody.Companion.toResponseBody
+import retrofit2.HttpException
 import retrofit2.Response
+import java.io.IOException
 
 object ResponseHandler {
     fun <T> handleCommonResponse(response: Response<T>): Resource<T> {
@@ -36,6 +39,23 @@ object ResponseHandler {
             val errorMessage = onError?.invoke(response.errorBody()?.string() ?: "Unknown error")
                 ?: response.errorBody()?.string() ?: "Unknown error"
             return Resource.Error(errorMessage)
+        }
+    }
+
+    suspend fun <T> safeApiCall(apiCall: suspend () -> Response<T>): Response<T> {
+        return try {
+            val response = apiCall.invoke()
+            if (response.isSuccessful) {
+                response
+            } else {
+                response
+            }
+        } catch (e: IOException) {
+            Response.error(500, "Network error".toResponseBody())
+        } catch (e: HttpException) {
+            Response.error(e.code(), "HTTP error".toResponseBody())
+        } catch (e: Exception) {
+            Response.error(500, "Unknown error".toResponseBody())
         }
     }
 }

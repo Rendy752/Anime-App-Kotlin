@@ -1,5 +1,6 @@
 package com.example.animeapp.utils
 
+import android.util.Log
 import android.os.Handler
 import android.os.Looper
 import android.view.View
@@ -19,15 +20,27 @@ class IntroOutroHandler(
     private val handler = Handler(Looper.getMainLooper())
     private var lastIntroVisibility: Int? = null
     private var lastOutroVisibility: Int? = null
+    private var isHandlerRunning = false
+
+    fun start() {
+        if (!isHandlerRunning) {
+            isHandlerRunning = true
+            handler.post(this)
+        }
+    }
 
     override fun run() {
+        if (!isHandlerRunning) return
+
         val currentPositionSec = player.currentPosition / 1000
+
+        Log.d("IntroOutroHandler", "Current Position: $currentPositionSec")
         val intro = videoData.intro
         val outro = videoData.outro
 
         if (intro != null && currentPositionSec in intro.start..intro.end && !introSkipped) {
             if (introButton?.visibility != View.VISIBLE) {
-                if(lastIntroVisibility != View.VISIBLE) {
+                if (lastIntroVisibility != View.VISIBLE) {
                     introButton?.visibility = View.VISIBLE
                     lastIntroVisibility = View.VISIBLE
                     setupIntroSkipButton(intro.end)
@@ -91,5 +104,10 @@ class IntroOutroHandler(
     fun releaseButtons() {
         introButton = null
         outroButton = null
+    }
+
+    fun stop() {
+        isHandlerRunning = false
+        handler.removeCallbacks(this)
     }
 }

@@ -51,7 +51,7 @@ object BindAnimeUtils {
                 layoutManager =
                     LinearLayoutManager(root.context, LinearLayoutManager.HORIZONTAL, false)
             }
-            "${data.type} (${data.episodes} eps)".also { tvAnimeType.text = it }
+            "${data.type ?: "Unknown"} (${data.episodes} eps)".also { tvAnimeType.text = it }
             "Ranked #${data.rank ?: 0}".also { tvAnimeRanked.text = it }
             "Popularity #${data.popularity}".also { tvAnimePopularity.text = it }
             "Scored ${data.score ?: 0} by ${data.scored_by ?: 0} users".also {

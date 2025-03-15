@@ -120,9 +120,9 @@ class AnimeSearchFragment : Fragment(), MenuProvider {
         bottomSheetDialog.setOnShowListener { dialog ->
             val bottomSheet =
                 (dialog as BottomSheetDialog).findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
-            val behavior = BottomSheetBehavior.from(bottomSheet!!)
+            val behavior = bottomSheet?.let { BottomSheetBehavior.from(it) }
 
-            bottomSheet.apply {
+            bottomSheet?.apply {
                 val layoutParams = layoutParams as CoordinatorLayout.LayoutParams
                 val horizontalMargin =
                     resources.getDimensionPixelSize(R.dimen.bottom_sheet_horizontal_margin)
@@ -139,7 +139,7 @@ class AnimeSearchFragment : Fragment(), MenuProvider {
                     }
             }
 
-            behavior.apply {
+            behavior?.apply {
                 state = BottomSheetBehavior.STATE_EXPANDED
                 maxHeight = resources.displayMetrics.heightPixels / 2
             }
